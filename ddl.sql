@@ -1,3 +1,9 @@
+-- This file creates the spotify database according to our ER schema from phase 2
+-- It also fills the Database with spotify data that has been collcted from Kaggle
+-- After following the directions in this file, you will have a local spotify DB, 
+-- We will still need to fill the composes, likes, follows, and listner table ourselves using randomized data
+
+
 -- To create spotify PostgreSQL DB on your local machine:
 -- git clone https://github.com/Joel-Hudgens/spotify_group_project_cse412.git
 -- Navigate inside the diretory you just cloned
@@ -50,7 +56,7 @@ CREATE TABLE Track (
 -- Weak entity of tracks (1:1 relationship)
 CREATE TABLE AudioFeature (
     track_id VARCHAR(75) PRIMARY KEY,
-    danceability FLOAT,
+    danceability FLOAT,     -- Some of these are actually ints but are being stored as floats so ill just keep for data integrity
     energy FLOAT,
     key_signature FLOAT,
     loudness FLOAT,
