@@ -4,8 +4,8 @@
 -----------------------------------------------------
 -- INSERT demo: add a new listener and sample likes
 -----------------------------------------------------
-INSERT INTO Listener (listener_id, username, password)
-VALUES ('demo_user', 'demo_username', 'password123')
+INSERT INTO Listener (username, password)
+VALUES ('demo_username', 'password123')
 ON CONFLICT (listener_id) DO NOTHING;
 
 -- Demo likes (top 3 most popular tracks)
