@@ -49,7 +49,7 @@ SELECT t.track_name AS track_name, a.album_name AS album_name, af.energy
 FROM Track t
 JOIN Album a ON t.album_id = a.album_id
 JOIN AudioFeature af ON af.track_id = t.track_id
-ORDER BY af.energy DESC
+ORDER BY af.energy DESC;
 
 -----------------------------------------------------
 -- SELECT demo #2: Average danceability by album
