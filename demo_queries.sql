@@ -45,21 +45,20 @@ SELECT track_id FROM Track ORDER BY popularity DESC NULLS LAST LIMIT 1
 -----------------------------------------------------
 -- SELECT demo #1: Top 10 energetic tracks
 -----------------------------------------------------
-SELECT t.name AS track_name, a.name AS album_name, af.energy
+SELECT t.track_name AS track_name, a.album_name AS album_name, af.energy
 FROM Track t
 JOIN Album a ON t.album_id = a.album_id
 JOIN AudioFeature af ON af.track_id = t.track_id
 ORDER BY af.energy DESC
-LIMIT 10;
 
 -----------------------------------------------------
 -- SELECT demo #2: Average danceability by album
 -----------------------------------------------------
-SELECT a.name AS album_name, AVG(af.danceability) AS avg_danceability, COUNT(*) AS num_tracks
+SELECT a.album_name AS album_name, AVG(af.danceability) AS avg_danceability, COUNT(*) AS num_tracks
 FROM Track t
 JOIN Album a ON t.album_id = a.album_id
 JOIN AudioFeature af ON af.track_id = t.track_id
-GROUP BY a.name
+GROUP BY a.album_name
 HAVING COUNT(*) >= 5
 ORDER BY avg_danceability DESC
 LIMIT 10;
