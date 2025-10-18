@@ -13,7 +13,7 @@ WITH top_tracks AS (
 SELECT track_id FROM Track ORDER BY popularity DESC NULLS LAST LIMIT 3
 )
 INSERT INTO Likes (listener_id, track_id)
-SELECT 'demo_user', track_id FROM top_tracks
+SELECT 1, track_id FROM top_tracks
 ON CONFLICT DO NOTHING;
 
 -- Demo follow (first 2 artists)
@@ -21,7 +21,7 @@ WITH some_artists AS (
 SELECT artist_id FROM Artist LIMIT 2
 )
 INSERT INTO Follows (listener_id, artist_id)
-SELECT 'demo_user', artist_id FROM some_artists
+SELECT 1, artist_id FROM some_artists
 ON CONFLICT DO NOTHING;
 
 -----------------------------------------------------
@@ -37,7 +37,7 @@ SELECT track_id FROM Track ORDER BY popularity DESC NULLS LAST LIMIT 1
 -- DELETE demo: unlike one track
 -----------------------------------------------------
 DELETE FROM Likes
-WHERE listener_id = 'demo_user'
+WHERE listener_id = 1
 AND track_id = (
 SELECT track_id FROM Track ORDER BY popularity DESC NULLS LAST LIMIT 1
 );
