@@ -1,6 +1,7 @@
 import psycopg2
 
-
+#Instructions:
+#first connect to the spotify database then edit in your information below(pretty sure its just database and user)
 #connecting to database also change database and user(when in postgre \du for users and \l for database)
 con = psycopg2.connect(
     host = "localhost",
