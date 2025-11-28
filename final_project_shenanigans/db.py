@@ -14,7 +14,7 @@ cur = con.cursor()
 
 
 #query shenanigans
-cur.execute("Select * From artist")
+cur.execute("select Artist.artist_name,track.track_name from track, composes, artist where track.track_id = composes.track_id and composes.artist_id = artist.artist_id and artist.artist_name = 'KSI';")
 
 column = cur.fetchall()
 
