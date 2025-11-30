@@ -1,6 +1,9 @@
 import psycopg2
 import tkinter as tk
 
+# Variables
+artistIndex = 0
+
 # GUI
 root = tk.Tk()
 root.title("Artist lookup") # Title
@@ -11,6 +14,12 @@ startFrame = tk.Frame(root)
 startFrame.grid(row=0, column=0)
 artistFrame = tk.Frame(root)
 artistFrame.grid(row=0, column=1)
+
+def setStartFrame():
+    startFrame.grid(row=0, column=0)
+
+def setArtistFrame():
+    artistFrame.grid(row=0, column=1)
  
 # Removes all widgets from a frame
 # widgets are the buttons, labels, etc from a frame.
@@ -19,22 +28,61 @@ def clear(frame):
     for i in widgets:
         i.destroy()
  
-# TODO: Add GUI to properly display artist information and songs
-def displayArtistFrame(searchEvent):
+# Both displays do the same thing, but the first one does it from the searchEntry 
+# and the other does it from an input artist name
+def displayArtistFrameSearch(event=None):
     clear(artistFrame)
-    text = searchEntry.get()
-    print(f"Search Clicked: {text}")
-    tk.Label(artistFrame, text="Hello").grid(row=0, column=0) # Remove the label and entry for actual info
-    tk.Entry(artistFrame).grid(row=1, column=0)
+    artistName = searchEntry.get()
+    print(f"Search Clicked: {artistName}")
+    artistTracks = fetchArtistInfo(artistName)
+    artistTrack = artistTracks[artistIndex][1]
+    artistInformation = tk.Label(artistFrame, text=artistTrack)
+    artistBackButton = tk.Button(artistFrame, text="Back", command=lambda: artistBackButtonPressed(artistName))
+    artistNextButton = tk.Button(artistFrame, text="Next", command=lambda: artistNextButtonPressed(artistName, len(artistTracks)))
 
+
+    artistNextButton.grid(row=0, column=2)
+    artistInformation.grid(row=0, column=1)
+    artistBackButton.grid(row=0, column=0)
+
+    clear(startFrame)
+    startFrame.grid_forget()
+
+def displayArtistFrameGiven(artistName):
+    clear(artistFrame)
+    print(f"Search Clicked: {artistName}")
+    artistTracks = fetchArtistInfo(artistName)
+    artistTrack = artistTracks[artistIndex][1]
+    artistInformation = tk.Label(artistFrame, text=artistTrack)
+    artistBackButton = tk.Button(artistFrame, text="Back", command=lambda: artistBackButtonPressed(artistName))
+    artistNextButton = tk.Button(artistFrame, text="Next", command=lambda: artistNextButtonPressed(artistName, len(artistTracks)))
+
+    artistNextButton.grid(row=0, column=2)
+    artistInformation.grid(row=0, column=1)
+    artistBackButton.grid(row=0, column=0)
     
+
+    clear(startFrame)
+    startFrame.grid_forget()
+
+def artistBackButtonPressed(artistName):
+    global artistIndex
+    if artistIndex != 0:
+        artistIndex -= 1
+    displayArtistFrameGiven(artistName)
+
+def artistNextButtonPressed(artistName, trackSize):
+    global artistIndex
+    if artistIndex < trackSize - 1:
+        artistIndex += 1
+    displayArtistFrameGiven(artistName)
  
 # persistent start buttons
-searchButton = tk.Button(startFrame, text="Search", command=displayArtistFrame)
+searchButton = tk.Button(startFrame, text="Search", command=displayArtistFrameSearch)
 searchButton.grid(row=0, column=1)
 searchEntry = tk.Entry(startFrame)
 searchEntry.grid(row=0, column=0)
-searchEntry.bind("<Return>", displayArtistFrame) # Allows you to press enter to search
+searchEntry.bind("<Return>", displayArtistFrameSearch) # Allows you to press enter to search
 
 
 
@@ -45,8 +93,7 @@ def fetchArtistInfo(name):
     if len(column) == 0:
         print("Artist not found")
     else:
-        for i in column:
-            print(i)
+        return column
 
     
 
@@ -68,9 +115,8 @@ cur = con.cursor()
 fetchArtistInfo("Pitbull")
 
 
+root.mainloop() # Displays GUI
+
 cur.close()
 
 con.close()
-
-root.mainloop() # Displays GUI
-
