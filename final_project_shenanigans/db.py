@@ -14,8 +14,8 @@ root = tk.Tk()
 searchText = tk.StringVar()
 searchTrackText = tk.StringVar()
 searchAlbumText = tk.StringVar()
-root.title("Artist lookup") # Title
-root.geometry("500x500") # Window size
+root.title("Spootify") # Title
+root.geometry("696x696") # Window size
 
 # Initialize frames
 loginFrame = tk.Frame(root) 
