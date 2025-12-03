@@ -22,15 +22,13 @@ startFrame = tk.Frame(root)
 startFrame.grid(row=0, column=1)
 artistFrame = tk.Frame(root)
 artistFrame.grid(row=0, column=2)
-advanceFrame = tk.Frame(root)
-advanceFrame.grid(row=0, column=3)
 
 # Sets visibility for start frame
 def setStartFrame():
     startFrame.grid(row=0, column=0)
 
 # Sets buttons and labels for start frame
-def sertStartFrameWidgets():
+def setStartFrameWidgets():
     searchButton = tk.Button(startFrame, text="Search", command=lambda: displayArtistFrame(searchEntry.get()))
     searchButton.grid(row=0, column=1)
     searchEntry = tk.Entry(startFrame, textvariable=searchText)
@@ -47,22 +45,17 @@ def displayStartFrame(event=None):
     if currentFrame == 'artistFrame':
         clear(artistFrame)
         artistFrame.grid_forget()
-    elif currentFrame == 'advanceFrame':
-        clear(advanceFrame)
-        advanceFrame.grid_forget()
     elif currentFrame == 'loginFrame':
         clear(loginFrame)
         loginFrame.grid_forget()
 
-    sertStartFrameWidgets()
+    setStartFrameWidgets()
     setStartFrame()
     
 # Sets visibility of artist frame.
 def setArtistFrame():
     artistFrame.grid(row=0, column=1)
 
-def displayAdvanceFrame():
-    print("test")
  
 # Removes all widgets from a frame
 # widgets are the buttons, labels, etc from a frame.
@@ -111,7 +104,7 @@ def artistNextButtonPressed(artistName, trackSize):
         artistIndex += 1
     displayArtistFrame(artistName)
 
-# TODO: make button take you to advanceFrame and display information 
+# Changes track label and displays audio information
 def advanceButtonPressed(trackID, artistInformation):
     cur.execute(f"select * from audiofeature where track_id = '{trackID}';")
     column = cur.fetchall()
