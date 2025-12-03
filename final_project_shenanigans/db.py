@@ -309,7 +309,7 @@ lbl2.pack(pady=1)
 passwordEntry = tk.Entry(loginFrame, textvariable="password")
 passwordEntry.pack(pady=1)
 
-loginButton = tk.Button(loginFrame, text="Login", command=lambda: validateUser("zebra_apple", "x9v3pL!"))#(usernameEntry.get(), passwordEntry.get()))
+loginButton = tk.Button(loginFrame, text="Login", command=lambda: validateUser(usernameEntry.get(), passwordEntry.get()))#("zebra_apple", "x9v3pL!"))
 loginButton.pack(pady=1)
 
 registerButton = tk.Button(loginFrame, text="Register", command=lambda: registerAccount(usernameEntry.get(), passwordEntry.get()))
