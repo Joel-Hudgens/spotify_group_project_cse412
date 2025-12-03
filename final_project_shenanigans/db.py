@@ -12,6 +12,8 @@ currentID = ''
 # GUI
 root = tk.Tk()
 searchText = tk.StringVar()
+searchTrackText = tk.StringVar()
+searchAlbumText = tk.StringVar()
 root.title("Artist lookup") # Title
 root.geometry("500x500") # Window size
 
@@ -22,6 +24,12 @@ startFrame = tk.Frame(root)
 startFrame.grid(row=0, column=1)
 artistFrame = tk.Frame(root)
 artistFrame.grid(row=0, column=2)
+favFrame = tk.Frame(root)
+favFrame.grid(row=0, column=3) 
+trackFrame = tk.Frame(root)
+trackFrame.grid(row=0, column=4) 
+albumFrame = tk.Frame(root)
+albumFrame.grid(row=0, column=5) 
 
 # Sets visibility for start frame
 def setStartFrame():
@@ -29,10 +37,28 @@ def setStartFrame():
 
 # Sets buttons and labels for start frame
 def setStartFrameWidgets():
-    searchButton = tk.Button(startFrame, text="Search", command=lambda: displayArtistFrame(searchEntry.get()))
+    searchButton = tk.Button(startFrame, text="Search Artist", command=lambda: displayArtistFrame(searchEntry.get()))
     searchButton.grid(row=0, column=1)
     searchEntry = tk.Entry(startFrame, textvariable=searchText)
     searchEntry.grid(row=0, column=0)
+
+    trackFavsButton = tk.Button(startFrame, text="Favorite Tracks", command=lambda: displayFavTrack(searchEntry.get()))
+    trackFavsButton.grid(row=3, column=0)
+    trackFavsButton.bind("<Return>", displayFavTrack) 
+
+    artistFavsButton = tk.Button(startFrame, text="Favorite Artists", command=lambda: displayFavArtist(searchEntry.get()))
+    artistFavsButton.grid(row=4, column=0)
+    artistFavsButton.bind("<Return>", displayFavArtist) 
+
+    searchTrackButton = tk.Button(startFrame, text="Search Track", command=lambda: displayTrackFrame(searchTrackEntry.get()))
+    searchTrackButton.grid(row=1, column=1)
+    searchTrackEntry = tk.Entry(startFrame, textvariable=searchTrackText)
+    searchTrackEntry.grid(row=1, column=0)
+
+    searchAlbumButton = tk.Button(startFrame, text="Search Album", command=lambda: displayAlbumFrame(searchAlbumEntry.get()))
+    searchAlbumButton.grid(row=2, column=1)
+    searchAlbumEntry = tk.Entry(startFrame, textvariable=searchAlbumText)
+    searchAlbumEntry.grid(row=2, column=0)
 
 # Removes start frame.
 def hideStartFrame():
@@ -48,6 +74,15 @@ def displayStartFrame(event=None):
     elif currentFrame == 'loginFrame':
         clear(loginFrame)
         loginFrame.grid_forget()
+    elif currentFrame == 'favFrame':
+        clear(favFrame)
+        favFrame.grid_forget()
+    elif currentFrame == 'trackFrame':
+        clear(trackFrame)
+        trackFrame.grid_forget()
+    elif currentFrame == 'albumFrame':
+        clear(albumFrame)
+        albumFrame.grid_forget()
 
     setStartFrameWidgets()
     setStartFrame()
@@ -56,18 +91,32 @@ def displayStartFrame(event=None):
 def setArtistFrame():
     artistFrame.grid(row=0, column=1)
 
+# Sets visibility of fav frame.
+def setFavFrame():
+    favFrame.grid(row=0, column=1)
+#sets visibility of track frame
+def setTrackFrame():
+    trackFrame.grid(row=0, column=1)
+
+#sets visibility of track frame
+def setAlbumFrame():
+    albumFrame.grid(row=0, column=1)
+
  
 # Removes all widgets from a frame
 # widgets are the buttons, labels, etc from a frame.
 def clear(frame):
     widgets = frame.grid_slaves()
     for i in widgets:
+        print("teset")
         i.destroy()
  
 # Displays artist frame given an artist name.
 def displayArtistFrame(artistName):
+    
     global currentFrame
     currentFrame = 'artistFrame'
+    artistFrame.grid_forget()
     clear(artistFrame)
     setArtistFrame()
     artistTracks = fetchArtistInfo(artistName)
@@ -90,6 +139,41 @@ def displayArtistFrame(artistName):
     hideStartFrame()
     startFrame.grid_forget()
 
+def displayAlbumFrame(albumName):
+    global currentFrame
+    currentFrame = 'albumFrame'
+    albumFrame.grid_forget()
+    clear(albumFrame)
+    setAlbumFrame()
+    albumTracks = fetchAlbumInfo(albumName)
+    print(albumTracks)
+    albumLabel = tk.Label(albumFrame, text=albumTracks)
+    albumLabel.grid(row=1, column=4, pady=1)
+
+    mainMenuButton = tk.Button(albumFrame, text="Main menu", command=lambda: displayStartFrame())
+    mainMenuButton.grid(row=2, column=4)
+
+    hideStartFrame()
+    startFrame.grid_forget()
+#TRAAAAAAAAAAAAACCCCCCCKKKKKKKKKKKKKKKKKKKKKKK SEEEEEEAAAAAAARRRRRRRRRRCHHHHHHHHHH
+def displayTrackFrame(trackName):
+    global currentFrame
+    currentFrame = 'trackFrame'
+    trackFrame.grid_forget()
+    clear(trackFrame)
+    setTrackFrame()
+    trackTracks = fetchTrackInfo(trackName)
+    print(trackTracks)
+    trackLabel = tk.Label(trackFrame, text=trackTracks)
+    trackLabel.grid(row=1, column=4, pady=1)
+    mainMenuButton = tk.Button(trackFrame, text="Main menu", command=lambda: displayStartFrame())
+    mainMenuButton.grid(row=2, column=4)
+
+    hideStartFrame()
+    startFrame.grid_forget()
+
+
+
 # Gets artist's previous track and updates frame
 def artistBackButtonPressed(artistName):
     global artistIndex
@@ -103,6 +187,64 @@ def artistNextButtonPressed(artistName, trackSize):
     if artistIndex < trackSize - 1:
         artistIndex += 1
     displayArtistFrame(artistName)
+
+
+
+
+
+def displayFavArtist(event=None):
+    global currentID
+    global currentFrame
+    clear(favFrame)
+    setFavFrame()
+    print(currentID)
+    currentFrame = 'favFrame'
+    cur.execute(f"select artist_name from artist, follows, listener where artist.artist_id = follows.artist_id and listener.listener_id = follows.listener_id and listener.listener_id = '{currentID}';")
+    column = str(cur.fetchall())
+    column = column.replace("{","")
+    column = column.replace("}","")
+    column = column.replace("(","")
+    column = column.replace(")","")
+    column = column.replace("'","")
+    column = column.replace("[","")
+    column = column.replace("]","")
+    print(column)
+    ftLabel = tk.Label(favFrame, text=column.replace(",","\n"))
+    ftLabel.grid(row=1, column=4, pady=1)
+
+    mainMenuButton = tk.Button(favFrame, text="Main menu", command=lambda: displayStartFrame())
+    mainMenuButton.grid(row=2, column=4, pady=1)
+    hideStartFrame()
+    startFrame.grid_forget()
+
+
+
+def displayFavTrack(event=None):
+    global currentID
+    global currentFrame
+    clear(favFrame)
+    setFavFrame()
+    currentFrame = 'favFrame'
+    cur.execute(f"select track_name from listener, track, likes where listener.listener_id = likes.listener_id and track.track_id = likes.track_id and listener.listener_id = '{currentID}';")
+    column = str(cur.fetchall())
+    column = column.replace("{","")
+    column = column.replace("}","")
+    column = column.replace("(","")
+    column = column.replace(")","")
+    column = column.replace("'","")
+    column = column.replace("[","")
+    column = column.replace("]","")
+    
+    print(column)
+    ftLabel = tk.Label(favFrame, text=column.replace(",","\n"))
+    ftLabel.grid(row=1, column=4, pady=1)
+    
+
+    mainMenuButton = tk.Button(favFrame, text="Main menu", command=lambda: displayStartFrame())
+    mainMenuButton.grid(row=2, column=4, pady=1)
+    hideStartFrame()
+    startFrame.grid_forget()
+
 
 # Changes track label and displays audio information
 def advanceButtonPressed(trackID, artistInformation):
@@ -167,7 +309,7 @@ lbl2.pack(pady=1)
 passwordEntry = tk.Entry(loginFrame, textvariable="password")
 passwordEntry.pack(pady=1)
 
-loginButton = tk.Button(loginFrame, text="Login", command=lambda: validateUser(usernameEntry.get(), passwordEntry.get()))
+loginButton = tk.Button(loginFrame, text="Login", command=lambda: validateUser("zebra_apple", "x9v3pL!"))#(usernameEntry.get(), passwordEntry.get()))
 loginButton.pack(pady=1)
 
 registerButton = tk.Button(loginFrame, text="Register", command=lambda: registerAccount(usernameEntry.get(), passwordEntry.get()))
@@ -182,7 +324,41 @@ def fetchArtistInfo(name):
         print("Artist not found")
     else:
         return column
+    
+def fetchTrackInfo(name):
+    if("'" in name):
+        name = name.replace("'","''")
+    cur.execute(f"select track_name, album_name, disc_number, track_number, duration_ms, is_explicit, popularity, preview_url, isrc from track, album where album.album_id = track.album_id and track_name = '{name}';")
+    column = cur.fetchall()
+    test = column[0]
+    print(test)
 
+
+
+    if len(column) == 0:
+        print("Track not found")
+    else:
+        return "Track: " + str(test[0]) + "\n" + "Album name: "+ str(test[1]) +"\n" + "Disc number: " + str(test[2]) +"\n" + "Track Number:"+ str(test[3]) +"\n" + "Duration: "+ str(test[4]) +"\n" + "Age appropriate: " + str(test[5]) +"\n" + "Popularity score: " +str(test[6]) +"\n" + "URL Link: " + str(test[7] + "\n" + "isrc: "+ str(test[8]))
+
+def fetchAlbumInfo(name):
+    if("'" in name):
+        name = name.replace("'","''")
+    cur.execute(f"select track_name from track, album where track.album_id = album.album_id and album_name = '{name}';")
+    column = str(cur.fetchall())
+    column = column.replace("',)", "\n")
+    column = column.replace(",", "")
+    column = column.replace("'", "")
+    column = column.replace("[", "")
+    column = column.replace("(", "")
+    column = column.replace("]", "")
+    column = column.replace(")","")
+
+
+
+    if len(column) == 0:
+        print("Track not found")
+    else:
+        return column
 #Instructions:
 #first connect to the spotify database then edit in your information below(pretty sure its just database and user)
 #connecting to database also change database and user(when in postgre \du for users and \l for database)
