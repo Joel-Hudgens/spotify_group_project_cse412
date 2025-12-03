@@ -13,7 +13,7 @@ currentID = ''
 root = tk.Tk()
 searchText = tk.StringVar()
 root.title("Artist lookup") # Title
-root.geometry("500x400") # Window size
+root.geometry("500x500") # Window size
 
 # Initialize frames
 loginFrame = tk.Frame(root) 
@@ -60,6 +60,9 @@ def displayStartFrame(event=None):
 # Sets visibility of artist frame.
 def setArtistFrame():
     artistFrame.grid(row=0, column=1)
+
+def displayAdvanceFrame():
+    print("test")
  
 # Removes all widgets from a frame
 # widgets are the buttons, labels, etc from a frame.
@@ -77,19 +80,19 @@ def displayArtistFrame(artistName):
     artistTracks = fetchArtistInfo(artistName)
     artistTrack = artistTracks[artistIndex][1]
     trackID = artistTracks[artistIndex][2]
-    artistInformation = tk.Label(artistFrame, text=artistTrack)
+    artistInformation = tk.Label(artistFrame, text=artistTrack, wraplength=200)
     artistBackButton = tk.Button(artistFrame, text="Back", command=lambda: artistBackButtonPressed(artistName))
     artistNextButton = tk.Button(artistFrame, text="Next", command=lambda: artistNextButtonPressed(artistName, len(artistTracks)))
 
-    artistNextButton.grid(row=1, column=4, pady=50)
-    artistInformation.grid(row=0, column=3, pady=50)
-    artistBackButton.grid(row=1, column=0, pady=50)
+    artistNextButton.grid(row=1, column=4, pady=25)
+    artistInformation.grid(row=0, column=3, pady=25)
+    artistBackButton.grid(row=1, column=0, pady=25)
 
     mainMenuButton = tk.Button(artistFrame, text="Main menu", command=lambda: displayStartFrame())
-    mainMenuButton.grid(row=2, column=0, pady=100)
+    mainMenuButton.grid(row=2, column=0)
 
-    advanceButton = tk.Button(artistFrame, text="Advance", command=lambda: advanceButtonPressed(trackID))
-    advanceButton.grid(row=2, column=4, pady=100)
+    advanceButton = tk.Button(artistFrame, text="Advance", command=lambda: advanceButtonPressed(trackID, artistInformation))
+    advanceButton.grid(row=2, column=4)
     
     hideStartFrame()
     startFrame.grid_forget()
@@ -109,10 +112,27 @@ def artistNextButtonPressed(artistName, trackSize):
     displayArtistFrame(artistName)
 
 # TODO: make button take you to advanceFrame and display information 
-def advanceButtonPressed(trackID):
-    cur.execute("select * from audiofeature where track_id = 'spotify:track:1XAZlnVtthcDZt2NI1Dtxo';")
+def advanceButtonPressed(trackID, artistInformation):
+    cur.execute(f"select * from audiofeature where track_id = '{trackID}';")
     column = cur.fetchall()
-    print(column)
+    trackData = column[0] 
+    
+    artistInformation.config(
+    text=f"track id = {trackData[0]}\n"
+         f"danceability = {trackData[1]}\n"
+         f"energy = {trackData[2]}\n"
+         f"key signature = {trackData[3]}\n"
+         f"loudness = {trackData[4]}\n"
+         f"mode = {trackData[5]}\n"
+         f"speechiness = {trackData[6]}\n"
+         f"acousticness = {trackData[7]}\n"
+         f"instrumentalness = {trackData[8]}\n"
+         f"liveness = {trackData[9]}\n"
+         f"valence = {trackData[10]}\n"
+         f"tempo = {trackData[11]}\n"
+         f"time signature = {trackData[12]}"
+    )
+
 
 # Checks if user is in the database.
 def validateUser(username, password):
