@@ -5,6 +5,8 @@ import tkinter as tk
 # Variables
 artistIndex = 0
 currentFrame = 'loginFrame'
+currentUsername = ''
+currentID = ''
 
 
 # GUI
@@ -114,15 +116,32 @@ def advanceButtonPressed(trackID):
 
 # Checks if user is in the database.
 def validateUser(username, password):
-    cur.execute(f"Select username, password from Listener where username = '{username}'and password = '{password}';")
+    global currentUsername
+    global currentID
+    cur.execute(f"Select username, password, listener_id from Listener where username = '{username}' and password = '{password}';")
     column = cur.fetchall()
     
 
     if len(column) == 0:
         print("oopsie poopsie")
     else:
-        print(f"hiiii {username}")
+        currentUsername = username
+        currentID = column[0][2]
+        print(currentID)
         displayStartFrame()
+
+# Creates the account. Does not allow for duplicate usernames.
+def registerAccount(username, password):
+    cur.execute(f"Select username from Listener where username = '{username}';")
+    column = cur.fetchall()
+
+    if len(column) == 0:
+        cur.execute(f"INSERT INTO Listener (username, password) VALUES ('{username}', '{password}') ON CONFLICT (listener_id) DO NOTHING;")
+        con.commit()
+        print("User created")
+    else: 
+        print("User already exist")
+    
 
 # Initial widgets for login page
 lbl = tk.Label(loginFrame, text="Username")
@@ -135,8 +154,11 @@ lbl2.pack(pady=1)
 passwordEntry = tk.Entry(loginFrame, textvariable="password")
 passwordEntry.pack(pady=1)
 
-loginButton = tk.Button(loginFrame, text="Login",command=lambda: validateUser(usernameEntry.get(), passwordEntry.get()))
+loginButton = tk.Button(loginFrame, text="Login", command=lambda: validateUser(usernameEntry.get(), passwordEntry.get()))
 loginButton.pack(pady=1)
+
+registerButton = tk.Button(loginFrame, text="Register", command=lambda: registerAccount(usernameEntry.get(), passwordEntry.get()))
+registerButton.pack(pady=1)
 
 # Fetches artist information. Used by artist frame.
 def fetchArtistInfo(name):
@@ -147,8 +169,6 @@ def fetchArtistInfo(name):
         print("Artist not found")
     else:
         return column
-
-    
 
 #Instructions:
 #first connect to the spotify database then edit in your information below(pretty sure its just database and user)
