@@ -15,7 +15,7 @@ searchText = tk.StringVar()
 searchTrackText = tk.StringVar()
 searchAlbumText = tk.StringVar()
 root.title("Spootify") # Title
-root.geometry("696x696") # Window size
+root.geometry("425x525") # Window size
 
 # Initialize frames
 loginFrame = tk.Frame(root) 
@@ -122,19 +122,23 @@ def displayArtistFrame(artistName):
     artistTracks = fetchArtistInfo(artistName)
     artistTrack = artistTracks[artistIndex][1]
     trackID = artistTracks[artistIndex][2]
-    artistInformation = tk.Label(artistFrame, text=artistTrack, wraplength=200)
-    artistBackButton = tk.Button(artistFrame, text="Back", command=lambda: artistBackButtonPressed(artistName))
-    artistNextButton = tk.Button(artistFrame, text="Next", command=lambda: artistNextButtonPressed(artistName, len(artistTracks)))
+    artistID = artistTracks[artistIndex][3]
+    # Add buttons on 2nd row under main button and advance button
+    # Add functions to check len of query and if what is returned in len 0, execute the query.
+    # You can use currentID to act as the Listener ID.
+    artistInformation = tk.Label(artistFrame, text=artistTrack, wraplength=200, width=20, height=20, padx=30)
+    artistBackButton = tk.Button(artistFrame, text="Back", command=lambda: artistBackButtonPressed(artistName), width=10, height=10)
+    artistNextButton = tk.Button(artistFrame, text="Next", command=lambda: artistNextButtonPressed(artistName, len(artistTracks)), width=10, height=10)
 
-    artistNextButton.grid(row=1, column=4, pady=25)
+    artistNextButton.grid(row=0, column=4, pady=25)
     artistInformation.grid(row=0, column=3, pady=25)
-    artistBackButton.grid(row=1, column=0, pady=25)
+    artistBackButton.grid(row=0, column=0, pady=25)
 
     mainMenuButton = tk.Button(artistFrame, text="Main menu", command=lambda: displayStartFrame())
-    mainMenuButton.grid(row=2, column=0)
+    mainMenuButton.grid(row=1, column=0)
 
     advanceButton = tk.Button(artistFrame, text="Advance", command=lambda: advanceButtonPressed(trackID, artistInformation))
-    advanceButton.grid(row=2, column=4)
+    advanceButton.grid(row=1, column=4)
     
     hideStartFrame()
     startFrame.grid_forget()
@@ -147,7 +151,7 @@ def displayAlbumFrame(albumName):
     setAlbumFrame()
     albumTracks = fetchAlbumInfo(albumName)
     print(albumTracks)
-    albumLabel = tk.Label(albumFrame, text=albumTracks)
+    albumLabel = tk.Label(albumFrame, text=albumTracks, wraplength=500)
     albumLabel.grid(row=1, column=4, pady=1)
 
     mainMenuButton = tk.Button(albumFrame, text="Main menu", command=lambda: displayStartFrame())
@@ -155,6 +159,7 @@ def displayAlbumFrame(albumName):
 
     hideStartFrame()
     startFrame.grid_forget()
+
 #TRAAAAAAAAAAAAACCCCCCCKKKKKKKKKKKKKKKKKKKKKKK SEEEEEEAAAAAAARRRRRRRRRRCHHHHHHHHHH
 def displayTrackFrame(trackName):
     global currentFrame
@@ -164,7 +169,7 @@ def displayTrackFrame(trackName):
     setTrackFrame()
     trackTracks = fetchTrackInfo(trackName)
     print(trackTracks)
-    trackLabel = tk.Label(trackFrame, text=trackTracks)
+    trackLabel = tk.Label(trackFrame, text=trackTracks, wraplength=500)
     trackLabel.grid(row=1, column=4, pady=1)
     mainMenuButton = tk.Button(trackFrame, text="Main menu", command=lambda: displayStartFrame())
     mainMenuButton.grid(row=2, column=4)
@@ -187,8 +192,6 @@ def artistNextButtonPressed(artistName, trackSize):
     if artistIndex < trackSize - 1:
         artistIndex += 1
     displayArtistFrame(artistName)
-
-
 
 
 
@@ -317,7 +320,7 @@ registerButton.pack(pady=1)
 
 # Fetches artist information. Used by artist frame.
 def fetchArtistInfo(name):
-    cur.execute(f"select Artist.artist_name, track.track_name, track.track_id from track, composes, artist where track.track_id = composes.track_id and composes.artist_id = artist.artist_id and artist.artist_name = '{name}';")
+    cur.execute(f"select Artist.artist_name, track.track_name, track.track_id, Artist.artist_id from track, composes, artist where track.track_id = composes.track_id and composes.artist_id = artist.artist_id and artist.artist_name = '{name}';")
     column = cur.fetchall()
 
     if len(column) == 0:
@@ -353,10 +356,8 @@ def fetchAlbumInfo(name):
     column = column.replace("]", "")
     column = column.replace(")","")
 
-
-
     if len(column) == 0:
-        print("Track not found")
+        return "Track not found"
     else:
         return column
 #Instructions:
