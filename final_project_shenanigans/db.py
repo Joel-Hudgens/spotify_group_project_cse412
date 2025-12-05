@@ -192,24 +192,52 @@ def displayTrackFrame(trackName):
     trackLabel.grid(row=1, column=4, pady=1)
     mainMenuButton = tk.Button(trackFrame, text="Main menu", command=lambda: displayStartFrame())
     mainMenuButton.grid(row=2, column=4)
+   
+    if("'" in trackName):
+        trackName = trackName.replace("'","''")
+    cur.execute(f"select track_id from track where track_name = '{trackName}';")
+    gettrackid = cur.fetchall()
+    gettrackid = gettrackid[0][0]
+    print(gettrackid)
+    likeButton = tk.Button(trackFrame, text="Like", command=lambda: likesTrack(currentID, gettrackid))
+    likeButton.grid(row=3, column=4)
 
     
 
     hideStartFrame()
     startFrame.grid_forget()
 
+
+
 def followArtist(listener_id, artist_id):
-    cur.execute(f"Select artist_name from artist where artist_id = '{artist_id}';")
+   cur.execute(f"Select artist_name from artist where artist_id = '{artist_id}';")
+   column = cur.fetchall()
+   artistName = column[0][0]
+   cur.execute(f"select artist_name from artist, follows, listener where artist.artist_id = follows.artist_id and listener.listener_id = follows.listener_id and listener.listener_id = '{listener_id}';")
+   followedArtists = [row[0] for row in cur.fetchall()]
+  
+   if str(artistName) not in followedArtists:
+       cur.execute(f"INSERT INTO Follows (listener_id, artist_id) values ('{listener_id}', '{artist_id}') ON CONFLICT (listener_id, artist_id) DO NOTHING;")
+      
+       con.commit()
+       print("artist followed")
+   else:
+       cur.execute(f"DELETE FROM Follows WHERE listener_id = '{listener_id}' AND artist_id = '{artist_id}';")
+       con.commit()
+       print("artist unfollowed")
+#EUHRUIUUIUIEUIWERHURWEHRUWEIHRUWEIHRUIHRUWEIHUWEIRHUIWEHUIWEHUEHWEIRHUIWERHUWEIUHRUIUUIUIEUIWERHURWEHRUWEIHRUWEIHRUIHRUWEIHUWEIRHUIWEHUIWEHUEHWEIRHUIWERHUWEIUHRUIUUIUIEUIWERHURWEHRUWEIHRUWEIHRUIHRUWEIHUWEIRHUIWEHUIWEHUEHWEIRHUIWERHUWEIUHRUIUUIUIEUIWERHURWEHRUWEIHRUWEIHRUIHRUWEIHUWEIRHUIWEHUIWEHUEHWEIRHUIWERHUWEI
+def likesTrack(listener_id, track_id):
+    cur.execute(f"Select track_name from track where track_id = '{track_id}';")
     column = cur.fetchall()
-    
+    print(track_id)
     print(column)
-    if str(column) not in "select artist_name from artist, follows, listener where artist.artist_id = follows.artist_id and listener.listener_id = follows.listener_id and listener.listener_id = '{listener_id}';":
-        cur.execute(f"INSERT INTO Follows (listener_id, artist_id) values ('{listener_id}', '{artist_id}') ON CONFLICT (listener_id, artist_id) DO NOTHING;")
+    if str(column) not in "select track_name from listener, track, likes where listener.listener_id = likes.listener_id and track.track_id = likes.track_id and listener.listener_id = '{listener_id}';":
+        cur.execute(f"INSERT INTO likes (listener_id, track_id) values ('{listener_id}', '{track_id}') ON CONFLICT (listener_id, track_id) DO NOTHING;")
         
         con.commit()
-        print("artist followed")
+        print("track liked")
     else: 
-        print("artist already followed")
+        print("track already liked")
 
 
 
@@ -261,7 +289,8 @@ def displayTopTrack(event=None):
     trackFrame.grid_forget()
     clear(trackFrame)
     setTrackFrame()
-    cur.execute(f"select track_name from track order by popularity Limit 10;")
+    cur.execute(f"select track_name from track order by popularity desc limit 10;")
+
     column = cur.fetchall()
     t = "1. " + column[0][0]+"\n"+"2. " +column[1][0]+"\n"+"3. " +column[2][0]+"\n"+"4. " +column[3][0]+"\n"+"5. " +column[4][0]+"\n"+"6. " +column[5][0]+"\n"+"7. " +column[6][0]+"\n"+"8. " +column[7][0]+"\n"+"9. " +column[8][0]+"\n"+"10. " +column[9][0]
 
@@ -276,9 +305,9 @@ def displayTopTrack(event=None):
 def displayTopArtist(event=None):
     global currentFrame
     currentFrame = 'artistFrame'
-    trackFrame.grid_forget()
+    artistFrame.grid_forget()
     clear(artistFrame)
-    setTrackFrame()
+    setArtistFrame()
     cur.execute(f"select artist_name from artist, follows, listener where artist.artist_id = follows.artist_id and listener.listener_id = follows.listener_id Limit 10;")
     column = cur.fetchall()
     t = "1. " + column[0][0]+"\n"+"2. " +column[1][0]+"\n"+"3. " +column[2][0]+"\n"+"4. " +column[3][0]+"\n"+"5. " +column[4][0]+"\n"+"6. " +column[5][0]+"\n"+"7. " +column[6][0]+"\n"+"8. " +column[7][0]+"\n"+"9. " +column[8][0]+"\n"+"10. " +column[9][0]
@@ -314,6 +343,7 @@ def displayFavTrack(event=None):
 
     mainMenuButton = tk.Button(favFrame, text="Main menu", command=lambda: displayStartFrame())
     mainMenuButton.grid(row=2, column=4, pady=1)
+    
     hideStartFrame()
     startFrame.grid_forget()
 
@@ -410,7 +440,7 @@ def fetchTrackInfo(name):
     if len(column) == 0:
         print("Track not found")
     else:
-        return "Track: " + str(test[0]) + "\n" + "Album name: "+ str(test[1]) +"\n" + "Disc number: " + str(test[2]) +"\n" + "Track Number:"+ str(test[3]) +"\n" + "Duration: "+ str(test[4]) +"\n" + "Age appropriate: " + str(test[5]) +"\n" + "Popularity score: " +str(test[6]) +"\n" + "URL Link: " + str(test[7] + "\n" + "isrc: "+ str(test[8]))
+        return "Track: " + str(test[0]) + "\n" + "Album name: "+ str(test[1]) +"\n" + "Disc number: " + str(test[2]) +"\n" + "Track Number:"+ str(test[3]) +"\n" + "Duration: "+ str(test[4]) +"\n" + "Age appropriate: " + str(test[5]) +"\n" + "Popularity score: " +str(test[6]) +"\n" + "URL Link: " + str(test[7]) + "\n" + "isrc: "+ str(test[8])
 
 def fetchAlbumInfo(name):
     if("'" in name):
