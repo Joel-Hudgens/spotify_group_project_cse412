@@ -124,7 +124,6 @@ def setAlbumFrame():
 def clear(frame):
     widgets = frame.grid_slaves()
     for i in widgets:
-        print("teset")
         i.destroy()
  
 # Displays artist frame given an artist name.
@@ -229,15 +228,19 @@ def followArtist(listener_id, artist_id):
 def likesTrack(listener_id, track_id):
     cur.execute(f"Select track_name from track where track_id = '{track_id}';")
     column = cur.fetchall()
-    print(track_id)
-    print(column)
-    if str(column) not in "select track_name from listener, track, likes where listener.listener_id = likes.listener_id and track.track_id = likes.track_id and listener.listener_id = '{listener_id}';":
+    trackName = column[0][0]
+    cur.execute(f"select track_name from listener, track, likes where listener.listener_id = likes.listener_id and track.track_id = likes.track_id and listener.listener_id = '{listener_id}';")
+    likedTracks = [row[0] for row in cur.fetchall()]
+    
+    if str(trackName) not in likedTracks:
         cur.execute(f"INSERT INTO likes (listener_id, track_id) values ('{listener_id}', '{track_id}') ON CONFLICT (listener_id, track_id) DO NOTHING;")
         
         con.commit()
         print("track liked")
     else: 
-        print("track already liked")
+        cur.execute(f"DELETE FROM likes WHERE listener_id = '{listener_id}' AND track_id = '{track_id}';")
+        con.commit()
+        print("Track unliked")
 
 
 
