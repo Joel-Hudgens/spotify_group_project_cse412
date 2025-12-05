@@ -37,28 +37,43 @@ def setStartFrame():
 
 # Sets buttons and labels for start frame
 def setStartFrameWidgets():
+ 
+    ftLabel = tk.Label(startFrame, text="Welcome " + currentUsername + "!", font = ('Arial', 11, 'bold'))
+    ftLabel.grid(row=0, column=0, pady=1)
+
+    spaceLabel = tk.Label(startFrame, text=" ")
+    spaceLabel.grid(row=4, column=0, pady=1)
+
     searchButton = tk.Button(startFrame, text="Search Artist", command=lambda: displayArtistFrame(searchEntry.get()))
-    searchButton.grid(row=0, column=1)
+    searchButton.grid(row=1, column=1)
     searchEntry = tk.Entry(startFrame, textvariable=searchText)
-    searchEntry.grid(row=0, column=0)
+    searchEntry.grid(row=1, column=0)
 
     trackFavsButton = tk.Button(startFrame, text="Favorite Tracks", command=lambda: displayFavTrack(searchEntry.get()))
-    trackFavsButton.grid(row=3, column=0)
+    trackFavsButton.grid(row=5, column=0)
     trackFavsButton.bind("<Return>", displayFavTrack) 
 
     artistFavsButton = tk.Button(startFrame, text="Favorite Artists", command=lambda: displayFavArtist(searchEntry.get()))
-    artistFavsButton.grid(row=4, column=0)
+    artistFavsButton.grid(row=6, column=0)
     artistFavsButton.bind("<Return>", displayFavArtist) 
 
     searchTrackButton = tk.Button(startFrame, text="Search Track", command=lambda: displayTrackFrame(searchTrackEntry.get()))
-    searchTrackButton.grid(row=1, column=1)
+    searchTrackButton.grid(row=2, column=1)
     searchTrackEntry = tk.Entry(startFrame, textvariable=searchTrackText)
-    searchTrackEntry.grid(row=1, column=0)
+    searchTrackEntry.grid(row=2, column=0)
 
     searchAlbumButton = tk.Button(startFrame, text="Search Album", command=lambda: displayAlbumFrame(searchAlbumEntry.get()))
-    searchAlbumButton.grid(row=2, column=1)
+    searchAlbumButton.grid(row=3, column=1)
     searchAlbumEntry = tk.Entry(startFrame, textvariable=searchAlbumText)
-    searchAlbumEntry.grid(row=2, column=0)
+    searchAlbumEntry.grid(row=3, column=0)
+
+    toptrackButton = tk.Button(startFrame, text="Top Tracks", command=lambda: displayTopTrack(searchEntry.get()))
+    toptrackButton.grid(row=5, column=1)
+    toptrackButton.bind("<Return>", displayTopTrack) 
+
+    topArtistButton = tk.Button(startFrame, text="Top Artist", command=lambda: displayTopArtist(searchEntry.get()))
+    topArtistButton.grid(row=6, column=1)
+    topArtistButton.bind("<Return>", displayTopArtist) 
 
 # Removes start frame.
 def hideStartFrame():
@@ -83,6 +98,7 @@ def displayStartFrame(event=None):
     elif currentFrame == 'albumFrame':
         clear(albumFrame)
         albumFrame.grid_forget()
+    
 
     setStartFrameWidgets()
     setStartFrame()
@@ -220,7 +236,41 @@ def displayFavArtist(event=None):
     hideStartFrame()
     startFrame.grid_forget()
 
+def displayTopTrack(event=None):
+    global currentFrame
+    currentFrame = 'trackFrame'
+    trackFrame.grid_forget()
+    clear(trackFrame)
+    setTrackFrame()
+    cur.execute(f"select track_name from track order by popularity Limit 10;")
+    column = cur.fetchall()
+    t = "1. " + column[0][0]+"\n"+"2. " +column[1][0]+"\n"+"3. " +column[2][0]+"\n"+"4. " +column[3][0]+"\n"+"5. " +column[4][0]+"\n"+"6. " +column[5][0]+"\n"+"7. " +column[6][0]+"\n"+"8. " +column[7][0]+"\n"+"9. " +column[8][0]+"\n"+"10. " +column[9][0]
 
+    trackLabel = tk.Label(trackFrame, text=t, wraplength=500)
+    trackLabel.grid(row=1, column=4, pady=1)
+    mainMenuButton = tk.Button(trackFrame, text="Main menu", command=lambda: displayStartFrame())
+    mainMenuButton.grid(row=2, column=4)
+
+    hideStartFrame()
+    startFrame.grid_forget()
+
+def displayTopArtist(event=None):
+    global currentFrame
+    currentFrame = 'artistFrame'
+    trackFrame.grid_forget()
+    clear(artistFrame)
+    setTrackFrame()
+    cur.execute(f"select artist_name from artist, follows, listener where artist.artist_id = follows.artist_id and listener.listener_id = follows.listener_id Limit 10;")
+    column = cur.fetchall()
+    t = "1. " + column[0][0]+"\n"+"2. " +column[1][0]+"\n"+"3. " +column[2][0]+"\n"+"4. " +column[3][0]+"\n"+"5. " +column[4][0]+"\n"+"6. " +column[5][0]+"\n"+"7. " +column[6][0]+"\n"+"8. " +column[7][0]+"\n"+"9. " +column[8][0]+"\n"+"10. " +column[9][0]
+
+    trackLabel = tk.Label(artistFrame, text=t, wraplength=500)
+    trackLabel.grid(row=1, column=4, pady=1)
+    mainMenuButton = tk.Button(artistFrame, text="Main menu", command=lambda: displayStartFrame())
+    mainMenuButton.grid(row=2, column=4)
+
+    hideStartFrame()
+    startFrame.grid_forget()
 
 def displayFavTrack(event=None):
     global currentID
@@ -312,7 +362,7 @@ lbl2.pack(pady=1)
 passwordEntry = tk.Entry(loginFrame, textvariable="password")
 passwordEntry.pack(pady=1)
 
-loginButton = tk.Button(loginFrame, text="Login", command=lambda: validateUser(usernameEntry.get(), passwordEntry.get()))#("zebra_apple", "x9v3pL!"))
+loginButton = tk.Button(loginFrame, text="Login", command=lambda: validateUser("zebra_apple", "x9v3pL!"))#(usernameEntry.get(), passwordEntry.get()))#
 loginButton.pack(pady=1)
 
 registerButton = tk.Button(loginFrame, text="Register", command=lambda: registerAccount(usernameEntry.get(), passwordEntry.get()))
