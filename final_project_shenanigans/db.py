@@ -150,6 +150,9 @@ def displayArtistFrame(artistName):
     artistInformation.grid(row=0, column=3, pady=25)
     artistBackButton.grid(row=0, column=0, pady=25)
 
+    followButton = tk.Button(artistFrame, text="Follow", command=lambda: followArtist(currentID, artistID))
+    followButton.grid(row=2, column=0)
+
     mainMenuButton = tk.Button(artistFrame, text="Main menu", command=lambda: displayStartFrame())
     mainMenuButton.grid(row=1, column=0)
 
@@ -190,8 +193,23 @@ def displayTrackFrame(trackName):
     mainMenuButton = tk.Button(trackFrame, text="Main menu", command=lambda: displayStartFrame())
     mainMenuButton.grid(row=2, column=4)
 
+    
+
     hideStartFrame()
     startFrame.grid_forget()
+
+def followArtist(listener_id, artist_id):
+    cur.execute(f"Select artist_name from artist where artist_id = '{artist_id}';")
+    column = cur.fetchall()
+    
+    print(column)
+    if str(column) not in "select artist_name from artist, follows, listener where artist.artist_id = follows.artist_id and listener.listener_id = follows.listener_id and listener.listener_id = '{listener_id}';":
+        cur.execute(f"INSERT INTO Follows (listener_id, artist_id) values ('{listener_id}', '{artist_id}') ON CONFLICT (listener_id, artist_id) DO NOTHING;")
+        
+        con.commit()
+        print("artist followed")
+    else: 
+        print("artist already followed")
 
 
 
@@ -233,6 +251,7 @@ def displayFavArtist(event=None):
 
     mainMenuButton = tk.Button(favFrame, text="Main menu", command=lambda: displayStartFrame())
     mainMenuButton.grid(row=2, column=4, pady=1)
+    
     hideStartFrame()
     startFrame.grid_forget()
 
